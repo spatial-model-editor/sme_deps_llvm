@@ -1,0 +1,41 @@
+language: cpp
+matrix:
+  include:
+  - os: linux
+    dist: xenial
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-9
+    before_install:
+    - sudo rm /usr/bin/gcc
+    - sudo rm /usr/bin/g++
+    - sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
+    - sudo ln -s /usr/bin/g++-9 /usr/bin/g++
+    - gcc --version
+    - g++ --version
+  - os: osx
+    osx_image: xcode9.4
+    compiler: clang
+script:
+- bash linux.sh
+- cd tarball
+- ls */*
+before_deploy:
+  tar -zcvf llvm-static-$TRAVIS_OS_NAME.tgz *
+deploy:
+  provider: releases
+  api_key:
+    secure: iEZlN4x/0BtFDeXKJs2eaWr2Wqlr3cbxlVF/sTM+elTzyM1TNdENTZIOTfjPe6iZcE/BeYTajs4lne5Sqlx69752KQDkvGFwg7CUCJ+6DFWS3KG3siLAFUxGbE6Om8i7DaU9q/XaLgHD9ZTivUVPo5Y7mZYdq9U6ZmZOI02m+t6jRhNYkhThS2AYnlBP58w5hMy/f+uFYd7c1WL3GNz4ouJ2dr4pobtNEuj3E4+D+mG+tBHLM5lWXQz+HgiW99wpraCEfaBrkpHk9/dPm9Q8fLaJn7RNjjzG3AoLwAEMx2TiQtaE9sGoX3iYofKp05y+duPGpcciK3EMXQGK0iYALXVvcqRxDQeSfc81CCvVgUr/h2NuHk/8GvYcjWCNBVEl9THpNMVvpxBxenK6ekPcoN7OC26dyiq0+DwsnYH48nVktngl+OS/Jbha0JU3HoIPy6rXfjZqPjjxMuxsiY3BoM1eFCXye65MOMhcPr5X6MHZfK6xOEOeiFCBTOeT2F7VmPChqohIXqNwE2oNyu1pse8OCIqg1S/XuoZV+eoKkbwhNSZvYNzAjxKfLtxZ2ZgoKRHXlRxp46ETmSEzPCp4DzPnwbwVtnlKCfUPE4ijvXcI2i2JWkottdUZajVQKtrHYwL3t5avKoKm9CJX19ofchaoBLpxGIXQq11cIiA3HvU=
+  file:
+    - llvm-static-$TRAVIS_OS_NAME.tgz
+  skip_cleanup: true
+  on:
+    repo: lkeegan/llvm-static
+    tags: true
+    all_branches: true
+notifications:
+  email: false

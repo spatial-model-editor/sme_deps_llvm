@@ -1,0 +1,24 @@
+name: build
+
+on: [push]
+
+jobs:
+  linux:
+
+    runs-on: ubuntu-16.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install gcc9
+      run: bash gcc9_ubuntu.sh
+    - name: build script
+      run: bash linux.sh
+
+  osx:
+
+    runs-on: macOS-10.14
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: build script
+      run: bash linux.sh

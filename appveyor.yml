@@ -1,0 +1,30 @@
+# windows release build: mingw64 g++ from MSYS2 (currently 9.1.0) on Windows Server 2012 R2
+image:
+  - Visual Studio 2015
+install:
+  - set PATH=C:\msys64\usr\bin;%PATH%
+
+build_script:
+  - cp windows.sh C:\msys64\home\appveyor\.
+  - bash -l windows.sh
+
+after_build:
+  - cd "C:\tarball"
+  - 7z a %APPVEYOR_BUILD_FOLDER%\llvm-static-windows.zip *
+
+artifacts:
+  - path: llvm-static-windows.zip
+    name: llvm-static-windows
+
+deploy:
+  description: ''
+  provider: GitHub
+  artifact: llvm-static-windows
+  auth_token:
+    secure: AzIgTar/Vk7S6hA8HAZAImacEIrbwmfrR6PJ+qHuAQHuLyPSAAcpI5rl/w6BumKp
+  draft: false
+  prerelease: false
+  force_update: true
+  on:
+    branch: master
+    APPVEYOR_REPO_TAG: true
