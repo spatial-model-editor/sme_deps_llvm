@@ -1,4 +1,7 @@
 language: cpp
+cache:
+  directories:
+    - llvm
 matrix:
   include:
   - os: linux
@@ -21,9 +24,16 @@ matrix:
     osx_image: xcode9.4
     compiler: clang
 script:
-- bash linux.sh
-- cd tarball
-- ls */*
+  # if setup is not done, run it
+  - test -f llvm/SETUP_COMPLETE || bash linux_setup.sh
+  # osx doesn't have timeout function, using this instead: https://gist.github.com/jaytaylor/6527607
+  - function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+  # do max 30mins=1800s of build
+  - timeout 1800 bash linux_continue.sh
+  # if build didn't finish in time the above exits with error:
+  #  - llvm dir in cache is updated
+  #  - restart travis job manually to continue build
+  - cd tarball
 before_deploy:
   tar -zcvf llvm-static-$TRAVIS_OS_NAME.tgz *
 deploy:
