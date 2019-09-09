@@ -21,18 +21,19 @@ matrix:
     - gcc --version
     - g++ --version
   - os: osx
-    osx_image: xcode9.4
+    osx_image: xcode10.3
     compiler: clang
 script:
-  # if setup is not done, run it
+  # if setup has not already been done, run it
   - test -f llvm/SETUP_COMPLETE || bash linux_setup.sh
   # osx doesn't have timeout function, using this instead: https://gist.github.com/jaytaylor/6527607
   - function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
-  # do max 30mins=1800s of build
+  # run the build for at most 30mins=1800s
   - timeout 1800 bash linux_continue.sh
-  # if build didn't finish in time the above exits with error:
-  #  - llvm dir in cache is updated
-  #  - restart travis job manually to continue build
+  # if the build didn't finish in time
+  #  - the above line exits with an error code
+  #  - the directory `llvm` in cache is updated with the current contents
+  #  - travis job can be manually restarted: will continue build using the cached files
   - cd tarball
 before_deploy:
   tar -zcvf llvm-static-$TRAVIS_OS_NAME.tgz *
