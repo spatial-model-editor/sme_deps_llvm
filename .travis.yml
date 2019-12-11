@@ -36,9 +36,8 @@ script:
   #  - the above line exits with an error code
   #  - the directory `llvm` in cache is updated with the current contents
   #  - travis job can be manually restarted: will continue build using the cached files
-  - cd tarball
 before_deploy:
-  tar -zcvf llvm-static-$TRAVIS_OS_NAME.tgz *
+  tar -zcvf llvm-static-$TRAVIS_OS_NAME.tgz /opt/libs/*
 deploy:
   provider: releases
   api_key:

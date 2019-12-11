@@ -17,7 +17,7 @@ build_script:
   - bash -l windows.sh
 
 after_build:
-  - cd "C:\tarball"
+  - cd "C:\libs"
   - 7z a %APPVEYOR_BUILD_FOLDER%\llvm-static-windows.zip *
 
 artifacts:
