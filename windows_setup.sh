@@ -1,4 +1,4 @@
-LLVM_VERSION="8.0.1"
+LLVM_VERSION="9.0.1"
 
 echo "Setup starting..."
 
