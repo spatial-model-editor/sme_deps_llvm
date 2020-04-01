@@ -1,50 +1,125 @@
+version: ~> 1.0
+os: linux
+dist: xenial
 language: cpp
 cache:
   directories:
     - llvm
-matrix:
+env:
+  global:
+    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-06-29/msys2-base-x86_64-20200629.sfx.exe'
+
+jobs:
   include:
-  - os: linux
-    dist: xenial
-    compiler: gcc
-    env: TRIPLE="x86_64-unknown-linux-gnu"
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        packages:
-        - g++-9
-    before_install:
-    - sudo rm /usr/bin/gcc
-    - sudo rm /usr/bin/g++
-    - sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
-    - sudo ln -s /usr/bin/g++-9 /usr/bin/g++
-    - gcc --version
-    - g++ --version
-  - os: osx
-    osx_image: xcode10.3
-    compiler: clang
-    env: TRIPLE="x86_64-apple-darwin16"
+    - name: "linux"
+      os: linux
+      dist: xenial
+      compiler: gcc
+      env: 
+        - INSTALL_PREFIX="/opt/libs"
+        - BUILD_SHELL='bash'
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+      install:
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+        - gcc --version
+        - g++ --version
+      before_script:
+        - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
+        - echo 'TARGET_TRIPLE="x86_64-unknown-linux-gnu"' >> source.sh
+        - echo 'MAKE_PROGRAM="make"' >> source.sh
+        - echo 'PYTHON_EXE="/opt/pyenv/shims/python"' >> source.sh
+        - echo 'MAKE_INSTALL="sudo make install"' >> source.sh
+        - cat source.sh
+    - name: "osx"
+      os: osx
+      osx_image: xcode11.3
+      compiler: clang
+      env:
+        - INSTALL_PREFIX="/opt/libs"
+        - BUILD_SHELL='bash'
+      before_script:
+        - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
+        - echo 'TARGET_TRIPLE="x86_64-apple-darwin16"' >> source.sh
+        - echo 'MAKE_PROGRAM="make"' >> source.sh
+        - echo 'PYTHON_EXE="/usr/bin/python"' >> source.sh
+        - echo 'MAKE_INSTALL="sudo make install"' >> source.sh
+        - cat source.sh
+    - name: "win64"
+      os: windows
+      env:
+        - INSTALL_PREFIX="/c/libs"
+        # this environment variable is here to ensure the two windows builds don't share the same cache
+        # see https://docs.travis-ci.com/user/caching#caches-and-build-matrices
+        - ARCH='x86_64'
+      install:
+        # https://www.msys2.org/docs/ci/
+        - wget $MSYS_URL -O msys2.exe
+        - ./msys2.exe -y -oC:\\
+        - export MSYS_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -msys -lc'
+        - $MSYS_SHELL ' '
+        - $MSYS_SHELL 'pacman --noconfirm -Syuu'
+        - $MSYS_SHELL 'pacman --noconfirm -Syuu'
+        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-$ARCH-gcc mingw-w64-$ARCH-make mingw-w64-$ARCH-cmake mingw-w64-$ARCH-python"
+        - export BUILD_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw64 -l'
+        - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+      before_script:
+        - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
+        - echo 'TARGET_TRIPLE="x86_64-w64-windows-gnu"' >> source.sh
+        - echo 'MAKE_PROGRAM="mingw32-make"' >> source.sh
+        - echo 'PYTHON_EXE="/mingw64/bin/python"' >> source.sh
+        - echo 'MAKE_INSTALL="mingw32-make install"' >> source.sh
+        - cat source.sh
+    - name: "win32"
+      os: windows
+      env:
+        - INSTALL_PREFIX="/c/libs"
+        - ARCH='i686'
+      install:
+        # https://www.msys2.org/docs/ci/
+        - wget $MSYS_URL -O msys2.exe 
+        - ./msys2.exe -y -oC:\\
+        - export MSYS_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -msys -lc'
+        - $MSYS_SHELL ' '
+        - $MSYS_SHELL 'pacman --noconfirm -Syuu'
+        - $MSYS_SHELL 'pacman --noconfirm -Syuu'
+        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-$ARCH-gcc mingw-w64-$ARCH-make mingw-w64-$ARCH-cmake mingw-w64-$ARCH-python"
+        - export BUILD_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw32 -l'
+        - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+      before_script:
+        - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
+        - echo 'TARGET_TRIPLE="x86-w32-windows-gnu"' >> source.sh
+        - echo 'MAKE_PROGRAM="mingw32-make"' >> source.sh
+        - echo 'PYTHON_EXE="/mingw32/bin/python"' >> source.sh
+        - echo 'MAKE_INSTALL="mingw32-make install"' >> source.sh
+        - cat source.sh
+
 script:
   # if setup has not already been done, run it
-  - test -f llvm/SETUP_COMPLETE || bash linux_setup.sh $TRIPLE
+  - if [ ! -f llvm/SETUP_COMPLETE ]; then $BUILD_SHELL setup.sh ; fi
   # osx doesn't have timeout function, using this instead: https://gist.github.com/jaytaylor/6527607
   - function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
-  # run the build for at most 30mins=1800s
-  - timeout 1800 bash linux_continue.sh
+  # run the build for at most 35mins=2100s (50min limit on travis job)
+  - $BUILD_SHELL -c "timeout 2100 bash continue.sh"
   # if the build didn't finish in time
   #  - the above line exits with an error code
   #  - the directory `llvm` in cache is updated with the current contents
   #  - travis job can be manually restarted: will continue build using the cached files
 before_deploy:
-  tar -zcvf llvm-static-$TRAVIS_OS_NAME.tgz /opt/libs/*
+  tar -zcvf llvm-static-$TRAVIS_JOB_NAME.tgz $INSTALL_PREFIX/*
 deploy:
+  edge: true
   provider: releases
-  api_key:
+  token:
     secure: iEZlN4x/0BtFDeXKJs2eaWr2Wqlr3cbxlVF/sTM+elTzyM1TNdENTZIOTfjPe6iZcE/BeYTajs4lne5Sqlx69752KQDkvGFwg7CUCJ+6DFWS3KG3siLAFUxGbE6Om8i7DaU9q/XaLgHD9ZTivUVPo5Y7mZYdq9U6ZmZOI02m+t6jRhNYkhThS2AYnlBP58w5hMy/f+uFYd7c1WL3GNz4ouJ2dr4pobtNEuj3E4+D+mG+tBHLM5lWXQz+HgiW99wpraCEfaBrkpHk9/dPm9Q8fLaJn7RNjjzG3AoLwAEMx2TiQtaE9sGoX3iYofKp05y+duPGpcciK3EMXQGK0iYALXVvcqRxDQeSfc81CCvVgUr/h2NuHk/8GvYcjWCNBVEl9THpNMVvpxBxenK6ekPcoN7OC26dyiq0+DwsnYH48nVktngl+OS/Jbha0JU3HoIPy6rXfjZqPjjxMuxsiY3BoM1eFCXye65MOMhcPr5X6MHZfK6xOEOeiFCBTOeT2F7VmPChqohIXqNwE2oNyu1pse8OCIqg1S/XuoZV+eoKkbwhNSZvYNzAjxKfLtxZ2ZgoKRHXlRxp46ETmSEzPCp4DzPnwbwVtnlKCfUPE4ijvXcI2i2JWkottdUZajVQKtrHYwL3t5avKoKm9CJX19ofchaoBLpxGIXQq11cIiA3HvU=
   file:
-    - llvm-static-$TRAVIS_OS_NAME.tgz
-  skip_cleanup: true
+    - llvm-static-$TRAVIS_JOB_NAME.tgz
+  cleanup: false
   on:
     repo: lkeegan/llvm-static
     tags: true
