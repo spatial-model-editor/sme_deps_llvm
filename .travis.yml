@@ -7,7 +7,7 @@ cache:
     - llvm
 env:
   global:
-    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-06-29/msys2-base-x86_64-20200629.sfx.exe'
+    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-07-20/msys2-base-x86_64-20200720.sfx.exe'
 
 jobs:
   include:
@@ -32,9 +32,8 @@ jobs:
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'TARGET_TRIPLE="x86_64-unknown-linux-gnu"' >> source.sh
-        - echo 'MAKE_PROGRAM="make"' >> source.sh
         - echo 'PYTHON_EXE="/opt/pyenv/shims/python"' >> source.sh
-        - echo 'MAKE_INSTALL="sudo make install"' >> source.sh
+        - echo 'SUDO_CMD="sudo"' >> source.sh
         - cat source.sh
     - name: "osx"
       os: osx
@@ -46,9 +45,8 @@ jobs:
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'TARGET_TRIPLE="x86_64-apple-darwin16"' >> source.sh
-        - echo 'MAKE_PROGRAM="make"' >> source.sh
         - echo 'PYTHON_EXE="/usr/bin/python"' >> source.sh
-        - echo 'MAKE_INSTALL="sudo make install"' >> source.sh
+        - echo 'SUDO_CMD="sudo"' >> source.sh
         - cat source.sh
     - name: "win64"
       os: windows
@@ -65,15 +63,15 @@ jobs:
         - $MSYS_SHELL ' '
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
-        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-$ARCH-gcc mingw-w64-$ARCH-make mingw-w64-$ARCH-cmake mingw-w64-$ARCH-python"
+        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-$ARCH-gcc mingw-w64-$ARCH-cmake mingw-w64-$ARCH-python make"
         - export BUILD_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw64 -l'
-        - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        - taskkill //IM gpg-agent.exe //F || echo "task not found" # https://travis-ci.community/t/4967
+        - taskkill //IM dirmngr.exe //F || echo "task not found" # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'TARGET_TRIPLE="x86_64-w64-windows-gnu"' >> source.sh
-        - echo 'MAKE_PROGRAM="mingw32-make"' >> source.sh
         - echo 'PYTHON_EXE="/mingw64/bin/python"' >> source.sh
-        - echo 'MAKE_INSTALL="mingw32-make install"' >> source.sh
+        - echo 'SUDO_CMD=""' >> source.sh
         - cat source.sh
     - name: "win32"
       os: windows
@@ -88,15 +86,15 @@ jobs:
         - $MSYS_SHELL ' '
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
         - $MSYS_SHELL 'pacman --noconfirm -Syuu'
-        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-$ARCH-gcc mingw-w64-$ARCH-make mingw-w64-$ARCH-cmake mingw-w64-$ARCH-python"
+        - $MSYS_SHELL "pacman --noconfirm -Syuu mingw-w64-$ARCH-gcc mingw-w64-$ARCH-cmake mingw-w64-$ARCH-python make"
         - export BUILD_SHELL='cmd //C RefreshEnv.cmd & C:\\msys64\\msys2_shell.cmd -defterm -no-start -here -mingw32 -l'
-        - taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+        - taskkill //IM gpg-agent.exe //F || echo "task not found" # https://travis-ci.community/t/4967
+        - taskkill //IM dirmngr.exe //F || echo "task not found" # similar to above
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
         - echo 'TARGET_TRIPLE="x86-w32-windows-gnu"' >> source.sh
-        - echo 'MAKE_PROGRAM="mingw32-make"' >> source.sh
         - echo 'PYTHON_EXE="/mingw32/bin/python"' >> source.sh
-        - echo 'MAKE_INSTALL="mingw32-make install"' >> source.sh
+        - echo 'SUDO_CMD=""' >> source.sh
         - cat source.sh
 
 script:
@@ -104,8 +102,8 @@ script:
   - if [ ! -f llvm/SETUP_COMPLETE ]; then $BUILD_SHELL setup.sh ; fi
   # osx doesn't have timeout function, using this instead: https://gist.github.com/jaytaylor/6527607
   - function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
-  # run the build for at most 35mins=2100s (50min limit on travis job)
-  - $BUILD_SHELL -c "timeout 2100 bash continue.sh"
+  # run the build for at most 30mins=1800s (50min limit on travis job)
+  - $BUILD_SHELL -c "timeout 1800 bash continue.sh"
   # if the build didn't finish in time
   #  - the above line exits with an error code
   #  - the directory `llvm` in cache is updated with the current contents
