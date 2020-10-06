@@ -7,7 +7,7 @@ cache:
     - llvm
 env:
   global:
-    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-07-20/msys2-base-x86_64-20200720.sfx.exe'
+    - MSYS_URL='https://github.com/msys2/msys2-installer/releases/download/2020-09-03/msys2-base-x86_64-20200903.sfx.exe'
 
 jobs:
   include:
@@ -16,7 +16,7 @@ jobs:
       dist: xenial
       compiler: gcc
       env: 
-        - INSTALL_PREFIX="/opt/libs"
+        - INSTALL_PREFIX="/opt/smelibs"
         - BUILD_SHELL='bash'
       addons:
         apt:
@@ -40,7 +40,7 @@ jobs:
       osx_image: xcode11.3
       compiler: clang
       env:
-        - INSTALL_PREFIX="/opt/libs"
+        - INSTALL_PREFIX="/opt/smelibs"
         - BUILD_SHELL='bash'
       before_script:
         - echo "INSTALL_PREFIX=$INSTALL_PREFIX" > source.sh
@@ -51,7 +51,7 @@ jobs:
     - name: "win64"
       os: windows
       env:
-        - INSTALL_PREFIX="/c/libs"
+        - INSTALL_PREFIX="/c/smelibs"
         # this environment variable is here to ensure the two windows builds don't share the same cache
         # see https://docs.travis-ci.com/user/caching#caches-and-build-matrices
         - ARCH='x86_64'
@@ -76,7 +76,7 @@ jobs:
     - name: "win32"
       os: windows
       env:
-        - INSTALL_PREFIX="/c/libs"
+        - INSTALL_PREFIX="/c/smelibs"
         - ARCH='i686'
       install:
         # https://www.msys2.org/docs/ci/
@@ -109,17 +109,17 @@ script:
   #  - the directory `llvm` in cache is updated with the current contents
   #  - travis job can be manually restarted: will continue build using the cached files
 before_deploy:
-  tar -zcvf llvm-static-$TRAVIS_JOB_NAME.tgz $INSTALL_PREFIX/*
+  tar -zcvf sme_deps_llvm_$TRAVIS_JOB_NAME.tgz $INSTALL_PREFIX/*
 deploy:
   edge: true
   provider: releases
   token:
     secure: iEZlN4x/0BtFDeXKJs2eaWr2Wqlr3cbxlVF/sTM+elTzyM1TNdENTZIOTfjPe6iZcE/BeYTajs4lne5Sqlx69752KQDkvGFwg7CUCJ+6DFWS3KG3siLAFUxGbE6Om8i7DaU9q/XaLgHD9ZTivUVPo5Y7mZYdq9U6ZmZOI02m+t6jRhNYkhThS2AYnlBP58w5hMy/f+uFYd7c1WL3GNz4ouJ2dr4pobtNEuj3E4+D+mG+tBHLM5lWXQz+HgiW99wpraCEfaBrkpHk9/dPm9Q8fLaJn7RNjjzG3AoLwAEMx2TiQtaE9sGoX3iYofKp05y+duPGpcciK3EMXQGK0iYALXVvcqRxDQeSfc81CCvVgUr/h2NuHk/8GvYcjWCNBVEl9THpNMVvpxBxenK6ekPcoN7OC26dyiq0+DwsnYH48nVktngl+OS/Jbha0JU3HoIPy6rXfjZqPjjxMuxsiY3BoM1eFCXye65MOMhcPr5X6MHZfK6xOEOeiFCBTOeT2F7VmPChqohIXqNwE2oNyu1pse8OCIqg1S/XuoZV+eoKkbwhNSZvYNzAjxKfLtxZ2ZgoKRHXlRxp46ETmSEzPCp4DzPnwbwVtnlKCfUPE4ijvXcI2i2JWkottdUZajVQKtrHYwL3t5avKoKm9CJX19ofchaoBLpxGIXQq11cIiA3HvU=
   file:
-    - llvm-static-$TRAVIS_JOB_NAME.tgz
+    - sme_deps_llvm_$TRAVIS_JOB_NAME.tgz
   cleanup: false
   on:
-    repo: lkeegan/llvm-static
+    repo: spatial-model-editor/sme_deps_llvm
     tags: true
     all_branches: true
 notifications:
