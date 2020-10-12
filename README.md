@@ -1,6 +1,6 @@
 # sme_deps_llvm [![Build Status](https://travis-ci.org/spatial-model-editor/sme_deps_llvm.svg?branch=master)](https://travis-ci.org/spatial-model-editor/sme_deps_llvm)
 
-[LLVM](https://llvm.org/) core 10.0.1 statically compiled for linux/osx/windows.
+[LLVM](https://llvm.org/) core 11.0.0 statically compiled for linux/osx/windows.
 
 Get the latest versions here:
 
