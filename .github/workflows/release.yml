@@ -1,0 +1,122 @@
+name: Release Builds
+
+on: push
+
+env:
+  LLVM_VERSION: '11.0.0'
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-16.04
+    env:
+      INSTALL_PREFIX: '/opt/smelibs'
+      SUDO_CMD: 'sudo'
+      TARGET_TRIPLE: 'x86_64-unknown-linux-gnu'
+      PYTHON_EXE: '/usr/bin/python3'
+      OS: 'linux'
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Set gcc version
+      run: |
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+    - uses: actions/checkout@v2
+    - name: Build script
+      run: ./build.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        path: ./artefacts/*
+
+  macos:
+    name: MacOS
+    runs-on: macos-10.15
+    env:
+      INSTALL_PREFIX: '/opt/smelibs'
+      SUDO_CMD: 'sudo'
+      TARGET_TRIPLE: 'x86_64-apple-darwin16'
+      PYTHON_EXE: '/usr/bin/python'
+      MACOSX_DEPLOYMENT_TARGET: '10.14'
+      OS: 'osx'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  win64:
+    name: Windows 64-bit
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: '/c/smelibs'
+      SUDO_CMD: ''
+      TARGET_TRIPLE: 'x86_64-w64-windows-gnu'
+      PYTHON_EXE: '/mingw64/bin/python'
+      OS: 'win64'
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-python make
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  win32:
+    name: Windows 32-bit
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: '/c/smelibs'
+      SUDO_CMD: ''
+      TARGET_TRIPLE: 'x86_64-w32-windows-gnu'
+      PYTHON_EXE: '/mingw32/bin/python'
+      OS: 'win32'
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-python make
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  release:
+    name: Upload Binaries to GitHub Release
+    needs: [linux, macos, win64, win32]
+    runs-on: ubuntu-18.04
+    # upload binaries to github release if commit is tagged
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: binaries
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: binaries/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
