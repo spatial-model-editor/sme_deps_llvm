@@ -1,6 +1,6 @@
 # sme_deps_llvm ![Release Builds](https://github.com/spatial-model-editor/sme_deps_llvm/workflows/Release%20Builds/badge.svg)
 
-[LLVM](https://llvm.org/) core 11.0.0 statically compiled for linux/osx/windows.
+[LLVM](https://llvm.org/) core 11.0.1 statically compiled for linux/osx/windows.
 
 Get the latest versions here:
 
