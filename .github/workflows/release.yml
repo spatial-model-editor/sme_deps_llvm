@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: '11.1.0'
+  LLVM_VERSION: '12.0.0'
 
 jobs:
   linux:
@@ -37,7 +37,7 @@ jobs:
       INSTALL_PREFIX: '/opt/smelibs'
       SUDO_CMD: 'sudo'
       TARGET_TRIPLE: 'x86_64-apple-darwin16'
-      PYTHON_EXE: '/usr/bin/python'
+      PYTHON_EXE: '/usr/bin/python3'
       MACOSX_DEPLOYMENT_TARGET: '10.14'
       OS: 'osx'
     defaults:
