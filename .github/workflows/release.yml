@@ -8,7 +8,7 @@ env:
 jobs:
   linux:
     name: Linux
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     env:
       INSTALL_PREFIX: '/opt/smelibs'
       SUDO_CMD: 'sudo'
@@ -104,7 +104,7 @@ jobs:
   release:
     name: Upload Binaries to GitHub Release
     needs: [linux, macos, win64, win32]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
