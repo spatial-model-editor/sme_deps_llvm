@@ -51,15 +51,15 @@ jobs:
         with:
           path: ./artefacts/*
 
-  win64:
-    name: Windows 64-bit
+  win64-mingw:
+    name: Windows 64-bit Mingw
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: '/c/smelibs'
       SUDO_CMD: ''
       TARGET_TRIPLE: 'x86_64-w64-windows-gnu'
       PYTHON_EXE: '/mingw64/bin/python'
-      OS: 'win64'
+      OS: 'win64-mingw'
     defaults:
       run:
         shell: msys2 {0}
@@ -76,15 +76,15 @@ jobs:
         with:
           path: ./artefacts/*
 
-  win32:
-    name: Windows 32-bit
+  win32-mingw:
+    name: Windows 32-bit Mingw
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: '/c/smelibs'
       SUDO_CMD: ''
       TARGET_TRIPLE: 'x86_64-w32-windows-gnu'
       PYTHON_EXE: '/mingw32/bin/python'
-      OS: 'win32'
+      OS: 'win32-mingw'
     defaults:
       run:
         shell: msys2 {0}
@@ -101,9 +101,47 @@ jobs:
         with:
           path: ./artefacts/*
 
+  win64-msvc:
+    name: Windows 64-bit MSVC
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: 'C:\smelibs'
+      TARGET_TRIPLE: 'x86_64-pc-windows-gnu'
+      OS: 'win64-msvc'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+          toolset: 14.0
+      - name: Build script
+        run: ./build.ps1
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
+  win32-msvc:
+    name: Windows 32-bit MSVC
+    runs-on: windows-2019
+    env:
+      INSTALL_PREFIX: 'C:\smelibs'
+      TARGET_TRIPLE: 'i686-pc-windows-gnu'
+      OS: 'win32-msvc'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
+          toolset: 14.0
+      - name: Build script
+        run: ./build.ps1
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
+
   release:
     name: Upload Binaries to GitHub Release
-    needs: [linux, macos, win64, win32]
+    needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
     runs-on: ubuntu-20.04
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
