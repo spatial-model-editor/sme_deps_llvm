@@ -3,43 +3,43 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: '12.0.1'
+  LLVM_VERSION: "12.0.1"
 
 jobs:
   linux:
     name: Linux
     runs-on: ubuntu-18.04
     env:
-      INSTALL_PREFIX: '/opt/smelibs'
-      SUDO_CMD: 'sudo'
-      TARGET_TRIPLE: 'x86_64-unknown-linux-gnu'
-      PYTHON_EXE: '/usr/bin/python3'
-      OS: 'linux'
+      INSTALL_PREFIX: "/opt/smelibs"
+      SUDO_CMD: "sudo"
+      TARGET_TRIPLE: "x86_64-unknown-linux-gnu"
+      PYTHON_EXE: "/usr/bin/python3"
+      OS: "linux"
     defaults:
       run:
         shell: bash
     steps:
-    - name: Set gcc version
-      run: |
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
-    - uses: actions/checkout@v2
-    - name: Build script
-      run: ./build.sh
-    - uses: actions/upload-artifact@v2
-      with:
-        path: ./artefacts/*
+      - name: Set gcc version
+        run: |
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+      - uses: actions/checkout@v2
+      - name: Build script
+        run: ./build.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./artefacts/*
 
   macos:
     name: MacOS
     runs-on: macos-10.15
     env:
-      INSTALL_PREFIX: '/opt/smelibs'
-      SUDO_CMD: 'sudo'
-      TARGET_TRIPLE: 'x86_64-apple-darwin16'
-      PYTHON_EXE: '/usr/bin/python3'
-      MACOSX_DEPLOYMENT_TARGET: '10.14'
-      OS: 'osx'
+      INSTALL_PREFIX: "/opt/smelibs"
+      SUDO_CMD: "sudo"
+      TARGET_TRIPLE: "x86_64-apple-darwin16"
+      PYTHON_EXE: "/usr/bin/python3"
+      MACOSX_DEPLOYMENT_TARGET: "10.14"
+      OS: "osx"
     defaults:
       run:
         shell: bash
@@ -55,11 +55,11 @@ jobs:
     name: Windows 64-bit Mingw
     runs-on: windows-2019
     env:
-      INSTALL_PREFIX: '/c/smelibs'
-      SUDO_CMD: ''
-      TARGET_TRIPLE: 'x86_64-w64-windows-gnu'
-      PYTHON_EXE: '/mingw64/bin/python'
-      OS: 'win64-mingw'
+      INSTALL_PREFIX: "/c/smelibs"
+      SUDO_CMD: ""
+      TARGET_TRIPLE: "x86_64-w64-windows-gnu"
+      PYTHON_EXE: "/mingw64/bin/python"
+      OS: "win64-mingw"
     defaults:
       run:
         shell: msys2 {0}
@@ -80,11 +80,11 @@ jobs:
     name: Windows 32-bit Mingw
     runs-on: windows-2019
     env:
-      INSTALL_PREFIX: '/c/smelibs'
-      SUDO_CMD: ''
-      TARGET_TRIPLE: 'x86_64-w32-windows-gnu'
-      PYTHON_EXE: '/mingw32/bin/python'
-      OS: 'win32-mingw'
+      INSTALL_PREFIX: "/c/smelibs"
+      SUDO_CMD: ""
+      TARGET_TRIPLE: "x86_64-w32-windows-gnu"
+      PYTHON_EXE: "/mingw32/bin/python"
+      OS: "win32-mingw"
     defaults:
       run:
         shell: msys2 {0}
@@ -106,8 +106,8 @@ jobs:
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: 'C:\smelibs'
-      TARGET_TRIPLE: 'x86_64-pc-windows-gnu'
-      OS: 'win64-msvc'
+      TARGET_TRIPLE: "x86_64-pc-windows-gnu"
+      OS: "win64-msvc"
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
@@ -125,8 +125,8 @@ jobs:
     runs-on: windows-2019
     env:
       INSTALL_PREFIX: 'C:\smelibs'
-      TARGET_TRIPLE: 'i686-pc-windows-gnu'
-      OS: 'win32-msvc'
+      TARGET_TRIPLE: "i686-pc-windows-gnu"
+      OS: "win32-msvc"
     steps:
       - uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
