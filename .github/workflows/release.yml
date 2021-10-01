@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: "12.0.1"
+  LLVM_VERSION: "13.0.0"
 
 jobs:
   linux:
