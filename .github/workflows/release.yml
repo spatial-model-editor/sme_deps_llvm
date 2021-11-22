@@ -15,14 +15,24 @@ jobs:
       TARGET_TRIPLE: "x86_64-unknown-linux-gnu"
       PYTHON_EXE: "/usr/bin/python3"
       OS: "linux"
+      CC: "clang"
+      CXX: "clang++"
     defaults:
       run:
         shell: bash
     steps:
-      - name: Set gcc version
+      - name: Add llvm repo for clang 13 & install
         run: |
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-13 main"
+          sudo apt update -yy
+          sudo apt install -yy clang-13
+      - name: Set clang version
+        run: |
+          sudo update-alternatives --remove-all clang || echo "nothing to remove"
+          sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100
       - uses: actions/checkout@v2
       - name: Build script
         run: ./build.sh
