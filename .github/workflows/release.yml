@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: "14.0.0"
+  LLVM_VERSION: "14.0.1"
 
 jobs:
   linux:
@@ -21,28 +21,28 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Add llvm repo for clang 13 & install
+      - name: Add llvm repo for clang 14 & install
         run: |
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-13 main"
+          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-14 main"
           sudo apt update -yy
-          sudo apt install -yy clang-13
+          sudo apt install -yy clang-14
       - name: Set clang version
         run: |
           sudo update-alternatives --remove-all clang || echo "nothing to remove"
           sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-13 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-13 100
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-14 100
       - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   macos:
     name: MacOS
-    runs-on: macos-10.15
+    runs-on: macos-11
     env:
       INSTALL_PREFIX: "/opt/smelibs"
       SUDO_CMD: "sudo"
@@ -57,13 +57,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win64-mingw:
     name: Windows 64-bit Mingw
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: "/c/smelibs"
       SUDO_CMD: ""
@@ -82,13 +82,13 @@ jobs:
           install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-python make
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win32-mingw:
     name: Windows 32-bit Mingw
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: "/c/smelibs"
       SUDO_CMD: ""
@@ -107,13 +107,13 @@ jobs:
           install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-python make
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win64-msvc:
     name: Windows 64-bit MSVC
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: 'C:\smelibs'
       TARGET_TRIPLE: "x86_64-pc-windows-gnu"
@@ -126,13 +126,13 @@ jobs:
           toolset: 14.0
       - name: Build script
         run: ./build.ps1
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
   win32-msvc:
     name: Windows 32-bit MSVC
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       INSTALL_PREFIX: 'C:\smelibs'
       TARGET_TRIPLE: "i686-pc-windows-gnu"
@@ -145,7 +145,7 @@ jobs:
           toolset: 14.0
       - name: Build script
         run: ./build.ps1
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./artefacts/*
 
@@ -156,7 +156,7 @@ jobs:
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: binaries
