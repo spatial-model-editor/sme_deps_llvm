@@ -8,7 +8,7 @@ env:
 jobs:
   linux:
     name: Linux
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       INSTALL_PREFIX: "/opt/smelibs"
       SUDO_CMD: "sudo"
@@ -24,7 +24,7 @@ jobs:
       - name: Add llvm repo for clang 14 & install
         run: |
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-14 main"
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
           sudo apt update -yy
           sudo apt install -yy clang-14
       - name: Set clang version
@@ -86,72 +86,9 @@ jobs:
         with:
           path: ./artefacts/*
 
-  win32-mingw:
-    name: Windows 32-bit Mingw
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: "/c/smelibs"
-      SUDO_CMD: ""
-      TARGET_TRIPLE: "x86_64-w32-windows-gnu"
-      PYTHON_EXE: "/mingw32/bin/python"
-      OS: "win32-mingw"
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW32
-          update: true
-          install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-python make
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
-
-  win64-msvc:
-    name: Windows 64-bit MSVC
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      TARGET_TRIPLE: "x86_64-pc-windows-gnu"
-      OS: "win64-msvc"
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
-          toolset: 14.0
-      - name: Build script
-        run: ./build.ps1
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
-
-  win32-msvc:
-    name: Windows 32-bit MSVC
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: 'C:\smelibs'
-      TARGET_TRIPLE: "i686-pc-windows-gnu"
-      OS: "win32-msvc"
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_x86
-          toolset: 14.0
-      - name: Build script
-        run: ./build.ps1
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./artefacts/*
-
   release:
     name: Upload Binaries to GitHub Release
-    needs: [linux, macos, win64-mingw, win32-mingw, win64-msvc, win32-msvc]
+    needs: [linux, macos, win64-mingw]
     runs-on: ubuntu-latest
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
