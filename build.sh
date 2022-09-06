@@ -26,6 +26,10 @@ wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSIO
 # workaround for msys2 (`tar xf file.tar.xz` hangs): https://github.com/msys2/MSYS2-packages/issues/1548
 xz -dc llvm-$LLVM_VERSION.src.tar.xz | tar -x --file=-
 mv llvm-$LLVM_VERSION.src/* llvm
+# get required *build-time only* cmake modules that are separately packaged
+wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/cmake-$LLVM_VERSION.src.tar.xz
+xz -dc cmake-$LLVM_VERSION.src.tar.xz | tar -x --file=-
+mv cmake-$LLVM_VERSION.src/Modules/* llvm/cmake/modules/.
 cd llvm
 
 # make build dir and run cmake
