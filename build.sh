@@ -27,9 +27,11 @@ wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSIO
 xz -dc llvm-$LLVM_VERSION.src.tar.xz | tar -x --file=-
 mv llvm-$LLVM_VERSION.src/* llvm
 # get required *build-time only* cmake modules that are separately packaged
+rm -rf cmake
+mkdir cmake
 wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/cmake-$LLVM_VERSION.src.tar.xz
 xz -dc cmake-$LLVM_VERSION.src.tar.xz | tar -x --file=-
-mv cmake-$LLVM_VERSION.src/Modules/* llvm/cmake/modules/.
+mv cmake-$LLVM_VERSION.src/* cmake/.
 cd llvm
 
 # make build dir and run cmake
