@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: "16.0.0"
+  LLVM_VERSION: "16.0.4"
 
 jobs:
   linux:
@@ -21,18 +21,18 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Add llvm repo for clang 14 & install
+      - name: Add llvm repo for clang 16 & install
         run: |
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
           sudo apt update -yy
-          sudo apt install -yy clang-14
+          sudo apt install -yy clang-16
       - name: Set clang version
         run: |
           sudo update-alternatives --remove-all clang || echo "nothing to remove"
           sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-14 100
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
       - uses: actions/checkout@v3
       - name: Build script
         run: ./build.sh
