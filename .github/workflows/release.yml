@@ -93,6 +93,8 @@ jobs:
     name: Upload Binaries to GitHub Release
     needs: [linux, macos, win64-mingw]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
