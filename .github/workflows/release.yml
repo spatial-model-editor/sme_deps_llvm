@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: "17.0.4"
+  LLVM_VERSION: "17.0.6"
 
 jobs:
   linux:
@@ -36,8 +36,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: artifacts-linux
           path: ./artefacts/*
 
   macos:
@@ -60,8 +61,9 @@ jobs:
           xcode-version: "14.3"
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: artifacts-macos
           path: ./artefacts/*
 
   win64-mingw:
@@ -85,8 +87,9 @@ jobs:
           install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-python make
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: artifacts-win64
           path: ./artefacts/*
 
   release:
@@ -98,9 +101,10 @@ jobs:
     # upload binaries to github release if commit is tagged
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          pattern: artifacts-*
+          merge-multiple: true
           path: binaries
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
