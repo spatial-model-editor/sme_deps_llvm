@@ -3,7 +3,7 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: "17.0.6"
+  LLVM_VERSION: "18.1.0"
 
 jobs:
   linux:
@@ -21,18 +21,18 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Add llvm repo for clang 17 & install
+      - name: Add llvm repo for clang 18 & install
         run: |
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main"
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-18 main"
           sudo apt update -yy
-          sudo apt install -yy clang-17
+          sudo apt install -yy clang-18
       - name: Set clang version
         run: |
           sudo update-alternatives --remove-all clang || echo "nothing to remove"
           sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-17 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-17 100
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
