@@ -3,98 +3,38 @@ name: Release Builds
 on: push
 
 env:
-  LLVM_VERSION: "18.1.0"
+  LLVM_VERSION: "18.1.3"
 
 jobs:
-  linux:
-    name: Linux
-    runs-on: ubuntu-20.04
-    env:
-      INSTALL_PREFIX: "/opt/smelibs"
-      SUDO_CMD: "sudo"
-      TARGET_TRIPLE: "x86_64-unknown-linux-gnu"
-      PYTHON_EXE: "/usr/bin/python3"
-      OS: "linux"
-      CC: "clang"
-      CXX: "clang++"
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-20.04"
+            shell: "bash"
+          - os: "macos-13"
+            shell: "bash"
+          - os: "windows-2022"
+            shell: "msys2 {0}"
     defaults:
       run:
-        shell: bash
+        shell: ${{ matrix.shell }}
     steps:
-      - name: Add llvm repo for clang 18 & install
-        run: |
-          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-18 main"
-          sudo apt update -yy
-          sudo apt install -yy clang-18
-      - name: Set clang version
-        run: |
-          sudo update-alternatives --remove-all clang || echo "nothing to remove"
-          sudo update-alternatives --remove-all clang++ || echo "nothing to remove"
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+      - uses: spatial-model-editor/setup-ci@v1
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: artifacts-linux
+          name: artifacts-${{ matrix.os }}
           path: ./artefacts/*
-
-  macos:
-    name: MacOS
-    runs-on: macos-13
-    env:
-      INSTALL_PREFIX: "/opt/smelibs"
-      SUDO_CMD: "sudo"
-      TARGET_TRIPLE: "x86_64-apple-darwin16"
-      PYTHON_EXE: "/usr/bin/python3"
-      MACOSX_DEPLOYMENT_TARGET: "11"
-      OS: "osx"
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v4
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: "14.3"
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-macos
-          path: ./artefacts/*
-
-  win64-mingw:
-    name: Windows 64-bit Mingw
-    runs-on: windows-2022
-    env:
-      INSTALL_PREFIX: "/c/smelibs"
-      SUDO_CMD: ""
-      TARGET_TRIPLE: "x86_64-w64-windows-gnu"
-      PYTHON_EXE: "/ucrt64/bin/python"
-      OS: "win64-mingw"
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: UCRT64
-          update: true
-          install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-python make
-      - name: Build script
-        run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-win64-mingw
-          path: ./artefacts/*
+          retention-days: 3
 
   release:
     name: Upload Binaries to GitHub Release
-    needs: [linux, macos, win64-mingw]
+    needs: [build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
