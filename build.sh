@@ -19,11 +19,6 @@ cmake --version
 which python
 python --version
 
-NPROCS=4
-if [[ "$OS_TARGET" == "osx" ]]; then
-    NPROCS=3
-fi
-
 # download LLVM source code
 rm -rf llvm
 mkdir llvm
@@ -42,7 +37,7 @@ cd llvm
 # make build dir and run cmake
 mkdir build
 cd build
-cmake -G "Unix Makefiles" .. \
+cmake -GNinja .. \
     -DPython3_EXECUTABLE=$PYTHON_EXE \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
     -DCMAKE_BUILD_TYPE=Release \
@@ -73,8 +68,8 @@ cmake -G "Unix Makefiles" .. \
     -DLLVM_ENABLE_WARNINGS=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF
 ls
-time make -j$NPROCS
-$SUDO_CMD make install
+time ninja
+$SUDO_CMD ninja install
 
 cd ../..
 mkdir artefacts
