@@ -18,6 +18,8 @@ jobs:
             shell: "bash"
           - os: "windows-2022"
             shell: "msys2 {0}"
+    permissions:
+      contents: write
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -26,31 +28,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-${{ matrix.os }}
-          path: ./artefacts/*
-          retention-days: 3
-
-  release:
-    name: Upload Binaries to GitHub Release
-    needs: [build]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    # upload binaries to github release if commit is tagged
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: artifacts-*
-          merge-multiple: true
-          path: binaries
-      - name: Upload binaries to release
+      - name: Upload binaries to release if commit is tagged
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: binaries/*
+          file: ./artefacts/*
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
