@@ -43,6 +43,7 @@ cmake -GNinja .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_DEFAULT_TARGET_TRIPLE=$TARGET_TRIPLE \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_BUILD_TOOLS=OFF \
     -DLLVM_INCLUDE_TOOLS=OFF \
@@ -70,6 +71,8 @@ cmake -GNinja .. \
 ls
 time ninja
 $SUDO_CMD ninja install
+
+ccache --show-stats
 
 cd ../..
 mkdir artefacts
