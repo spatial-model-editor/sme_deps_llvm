@@ -2,7 +2,7 @@
 
 set -e -x
 
-BUILD_DIR=`pwd`
+BUILD_DIR=$(pwd)
 
 echo "LLVM_VERSION = $LLVM_VERSION"
 echo "TARGET_TRIPLE = $TARGET_TRIPLE"
