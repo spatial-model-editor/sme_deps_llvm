@@ -1,7 +1,10 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "18.1.5"
+  LLVM_VERSION: "18.1.8"
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ${{ matrix.os }}
