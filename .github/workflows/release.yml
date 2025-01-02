@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "18.1.8"
+  LLVM_VERSION: "19.1.6"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-20.04"
+          - os: "ubuntu-22.04"
             shell: "bash"
             LLVM_TARGETS_TO_BUILD: "X86"
           - os: "macos-13"
@@ -32,7 +32,7 @@ jobs:
     env:
       LLVM_TARGETS_TO_BUILD: ${{ matrix.LLVM_TARGETS_TO_BUILD }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2024.04.23
+      - uses: spatial-model-editor/setup-ci@2025.01.02
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
