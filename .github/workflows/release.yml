@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "19.1.6"
+  LLVM_VERSION: "19.1.7"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -15,6 +15,9 @@ jobs:
           - os: "ubuntu-22.04"
             shell: "bash"
             LLVM_TARGETS_TO_BUILD: "X86"
+          - os: "ubuntu-22.04-arm"
+            shell: "bash"
+            LLVM_TARGETS_TO_BUILD: "AArch64"
           - os: "macos-13"
             shell: "bash"
             LLVM_TARGETS_TO_BUILD: "X86"
