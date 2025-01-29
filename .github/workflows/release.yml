@@ -35,7 +35,7 @@ jobs:
     env:
       LLVM_TARGETS_TO_BUILD: ${{ matrix.LLVM_TARGETS_TO_BUILD }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.01.02
+      - uses: spatial-model-editor/setup-ci@main
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
