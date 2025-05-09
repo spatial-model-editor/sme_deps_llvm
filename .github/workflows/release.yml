@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "19.1.7"
+  LLVM_VERSION: "20.1.4"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -27,6 +27,9 @@ jobs:
           - os: "windows-2022"
             shell: "msys2 {0}"
             LLVM_TARGETS_TO_BUILD: "X86"
+          - os: "windows-11-arm"
+            shell: "msys2 {0}"
+            LLVM_TARGETS_TO_BUILD: "AArch64"
     permissions:
       contents: write
     defaults:
@@ -35,7 +38,7 @@ jobs:
     env:
       LLVM_TARGETS_TO_BUILD: ${{ matrix.LLVM_TARGETS_TO_BUILD }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.02.03
+      - uses: spatial-model-editor/setup-ci@2025.05.09
       - uses: actions/checkout@v4
       - name: Build script
         run: ./build.sh
