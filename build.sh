@@ -25,8 +25,7 @@ mkdir llvm
 wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/llvm-project-$LLVM_VERSION.src.tar.xz
 # workaround for msys2 (`tar xf file.tar.xz` hangs): https://github.com/msys2/MSYS2-packages/issues/1548
 xz -dc llvm-project-$LLVM_VERSION.src.tar.xz | tar -x --file=-
-mv llvm-project-$LLVM_VERSION.src/* llvm-project
-cd llvm-project/llvm
+cd llvm-project-$LLVM_VERSION.src/llvm
 
 # make build dir and run cmake
 mkdir build
@@ -71,7 +70,7 @@ $SUDO_CMD ninja install
 
 ccache --show-stats
 
-cd ../..
+cd ../../..
 mkdir artefacts
 cd artefacts
 tar -zcvf sme_deps_llvm_$OS.tgz $INSTALL_PREFIX/*
