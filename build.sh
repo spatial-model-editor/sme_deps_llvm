@@ -32,6 +32,12 @@ mkdir cmake
 wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/cmake-$LLVM_VERSION.src.tar.xz
 xz -dc cmake-$LLVM_VERSION.src.tar.xz | tar -x --file=-
 mv cmake-$LLVM_VERSION.src/* cmake/.
+# get required third party code that is separately packaged
+rm -rf third-party
+mkdir third-party
+wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/third-party-$LLVM_VERSION.src.tar.xz
+xz -dc third-party-$LLVM_VERSION.src.tar.xz | tar -x --file=-
+mv third-party-$LLVM_VERSION.src/* third-party/.
 cd llvm
 
 # make build dir and run cmake
