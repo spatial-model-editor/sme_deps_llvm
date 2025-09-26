@@ -22,23 +22,11 @@ python --version
 # download LLVM source code
 rm -rf llvm
 mkdir llvm
-wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/llvm-$LLVM_VERSION.src.tar.xz
+wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/llvm-project-$LLVM_VERSION.src.tar.xz
 # workaround for msys2 (`tar xf file.tar.xz` hangs): https://github.com/msys2/MSYS2-packages/issues/1548
-xz -dc llvm-$LLVM_VERSION.src.tar.xz | tar -x --file=-
-mv llvm-$LLVM_VERSION.src/* llvm
-# get required *build-time only* cmake modules that are separately packaged
-rm -rf cmake
-mkdir cmake
-wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/cmake-$LLVM_VERSION.src.tar.xz
-xz -dc cmake-$LLVM_VERSION.src.tar.xz | tar -x --file=-
-mv cmake-$LLVM_VERSION.src/* cmake/.
-# get required third party code that is separately packaged
-rm -rf third-party
-mkdir third-party
-wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/third-party-$LLVM_VERSION.src.tar.xz
-xz -dc third-party-$LLVM_VERSION.src.tar.xz | tar -x --file=-
-mv third-party-$LLVM_VERSION.src/* third-party/.
-cd llvm
+xz -dc llvm-project-$LLVM_VERSION.src.tar.xz | tar -x --file=-
+mv llvm-project-$LLVM_VERSION.src/* llvm-project
+cd llvm-project/llvm
 
 # make build dir and run cmake
 mkdir build
