@@ -20,12 +20,8 @@ which python
 python --version
 
 # download LLVM source code
-rm -rf llvm
-mkdir llvm
-wget https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSION/llvm-project-$LLVM_VERSION.src.tar.xz
-# workaround for msys2 (`tar xf file.tar.xz` hangs): https://github.com/msys2/MSYS2-packages/issues/1548
-xz -dc llvm-project-$LLVM_VERSION.src.tar.xz | tar -x --file=-
-cd llvm-project-$LLVM_VERSION.src/llvm
+git clone -b $LLVM_VERSION --depth 1 https://github.com/llvm/llvm-project.git
+cd llvm-project/llvm
 
 # make build dir and run cmake
 mkdir build
