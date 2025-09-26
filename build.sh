@@ -20,7 +20,7 @@ which python
 python --version
 
 # download LLVM source code
-git clone -b $LLVM_VERSION --depth 1 https://github.com/llvm/llvm-project.git
+git clone -b llvmorg-$LLVM_VERSION --depth 1 https://github.com/llvm/llvm-project.git
 cd llvm-project/llvm
 
 # make build dir and run cmake
