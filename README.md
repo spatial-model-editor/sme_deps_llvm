@@ -9,4 +9,4 @@ Get the latest versions here:
 - osx (Xcode 14.3 / macOS 13): [sme_deps_llvm_osx.tgz](https://github.com/spatial-model-editor/sme_deps_llvm/releases/latest/download/sme_deps_llvm_osx.tgz)
 - osx-arm64 (Xcode 16.1 / macOS 14): [sme_deps_llvm_osx-arm64.tgz](https://github.com/spatial-model-editor/sme_deps_llvm/releases/latest/download/sme_deps_llvm_osx-arm64.tgz)
 - win64-mingw (mingw-w64-x86_64-gcc 15): [sme_deps_llvm_win64-mingw.tgz](https://github.com/spatial-model-editor/sme_deps_llvm/releases/latest/download/sme_deps_llvm_win64-mingw.tgz)
-- win64-arm64 (mingw-w64-aarch64-clang 20): [sme_deps_llvm_win64-arm64.tgz](https://github.com/spatial-model-editor/sme_deps_llvm/releases/latest/download/sme_deps_llvm_win64-arm64.tgz)
+- win64-arm64 (mingw-w64-aarch64-clang 21): [sme_deps_llvm_win64-arm64.tgz](https://github.com/spatial-model-editor/sme_deps_llvm/releases/latest/download/sme_deps_llvm_win64-arm64.tgz)

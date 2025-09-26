@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "20.1.6"
+  LLVM_VERSION: "21.1.2"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
