@@ -6,7 +6,9 @@ BUILD_DIR=$(pwd)
 
 echo "LLVM_VERSION = $LLVM_VERSION"
 echo "TARGET_TRIPLE = $TARGET_TRIPLE"
+echo "LLVM_USE_SANITIZER = $LLVM_USE_SANITIZER"
 echo "INSTALL_PREFIX = $INSTALL_PREFIX"
+echo "BUILD_TAG = $BUILD_TAG"
 echo "SUDO_CMD = $SUDO_CMD"
 echo "PYTHON_EXE = $PYTHON_EXE"
 echo "PATH=$PATH"
@@ -31,8 +33,8 @@ cmake -GNinja .. \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-    -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_CXX_VISIBILITY_PRESET=hidden \
     -DLLVM_DEFAULT_TARGET_TRIPLE=$TARGET_TRIPLE \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
@@ -59,7 +61,8 @@ cmake -GNinja .. \
     -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
     -DLLVM_ENABLE_WARNINGS=OFF \
-    -DLLVM_ENABLE_Z3_SOLVER=OFF
+    -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    -DLLVM_USE_SANITIZER=$LLVM_USE_SANITIZER
 ls
 time ninja
 $SUDO_CMD ninja install
@@ -69,4 +72,4 @@ ccache --show-stats
 cd ../../..
 mkdir artefacts
 cd artefacts
-tar -zcvf sme_deps_llvm_$OS.tgz $INSTALL_PREFIX/*
+tar -zcvf sme_deps_llvm_${OS}${BUILD_TAG}.tgz $INSTALL_PREFIX/*
