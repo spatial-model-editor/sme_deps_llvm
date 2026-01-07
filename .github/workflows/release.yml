@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "21.1.2"
+  LLVM_VERSION: "21.1.8"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -23,9 +23,6 @@ jobs:
           - os: "ubuntu-22.04-arm"
             shell: "bash"
             LLVM_TARGETS_TO_BUILD: "AArch64"
-          - os: "macos-13"
-            shell: "bash"
-            LLVM_TARGETS_TO_BUILD: "X86"
           - os: "macos-14"
             shell: "bash"
             LLVM_TARGETS_TO_BUILD: "AArch64"
@@ -45,10 +42,10 @@ jobs:
       LLVM_USE_SANITIZER: ${{ matrix.LLVM_USE_SANITIZER }}
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.05.09
+      - uses: spatial-model-editor/setup-ci@2025.10.15
         with:
           cache_id: ${{ matrix.BUILD_TAG }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build script
         run: ./build.sh
       - name: Upload binaries to release if commit is tagged
