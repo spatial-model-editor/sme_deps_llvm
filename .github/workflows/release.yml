@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "21.1.8"
+  LLVM_VERSION: "22.1.1"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -42,7 +42,7 @@ jobs:
       LLVM_USE_SANITIZER: ${{ matrix.LLVM_USE_SANITIZER }}
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2025.10.15
+      - uses: spatial-model-editor/setup-ci@2026.03.23
         with:
           cache_id: ${{ matrix.BUILD_TAG }}
       - uses: actions/checkout@v6
