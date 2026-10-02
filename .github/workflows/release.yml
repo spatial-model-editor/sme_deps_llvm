@@ -1,7 +1,7 @@
 name: Release Builds
 on: push
 env:
-  LLVM_VERSION: "22.1.2"
+  LLVM_VERSION: "23.1.2"
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -20,7 +20,7 @@ jobs:
             BUILD_TAG: "_tsan"
           - os: "ubuntu-22.04-arm"
             LLVM_TARGETS_TO_BUILD: "AArch64"
-          - os: "macos-14"
+          - os: "macos-26"
             LLVM_TARGETS_TO_BUILD: "AArch64"
           - os: "windows-2022"
             LLVM_TARGETS_TO_BUILD: "X86"
@@ -33,10 +33,10 @@ jobs:
       LLVM_USE_SANITIZER: ${{ matrix.LLVM_USE_SANITIZER }}
       BUILD_TAG: ${{ matrix.BUILD_TAG }}
     steps:
-      - uses: spatial-model-editor/setup-ci@2026.03.27
+      - uses: spatial-model-editor/setup-ci@2026.10.02
         with:
           cache_id: ${{ matrix.BUILD_TAG }}
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build script
         if: runner.os != 'Windows'
         run: ./build.sh
